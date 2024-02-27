@@ -1,0 +1,9 @@
+Disabled LDAP Group
+============================================================
+Please note that the following LDAP Group have been disabled.
+$!{t}
+$!{tr}$!{tdl}   LDAP GROUP: $!{td_}			$!{tdv}${label}$!{td_}$!{tr_}
+$!{tr}$!{tdl}   TIME: $!{td_}			$!{tdv}${time}$!{td_}$!{tr_}
+$!{tr}$!{tdl}   AFFECTED PROJECTS: $!{td_}			$!{tdv}${projects}$!{td_}$!{tr_}
+$!{tr}$!{tdl}   REASON: $!{td_}			$!{tdv}${reason}$!{td_}$!{tr_}
+$!{t_}

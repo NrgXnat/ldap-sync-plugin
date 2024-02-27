@@ -1,0 +1,18 @@
+#ldap-warning-container {
+    display:none;
+    margin-bottom: 20px;
+}
+
+#ldap-warning-container span.messages {
+    display:none;
+}
+
+#ldap-warning-container span.close {
+    float: right;
+    cursor: pointer;
+    margin: -8px -4px;
+}
+
+#project-user-list .disabled {
+    color: gray !important;
+}

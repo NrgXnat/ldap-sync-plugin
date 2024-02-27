@@ -1,0 +1,51 @@
+# Site Setting for the LDAP synchronization plugin
+
+siteSettings:
+  kind: tabs
+  name: ldapSyncSiteAdminPage
+  label: Administer LDAP synchronization Service
+  meta:
+    tabGroups:
+      ldapSyncTabGroup: LDAP Synchronization
+  contains: tabs
+  tabs:
+    ldapSyncPreferencesTab:
+      kind: tab
+      name: ldapSyncPreferencesTab
+      label: Preferences
+      group: ldapSyncTabGroup
+      active: true
+      contents:
+        ${ldapSyncGeneralSettingsPanel}
+        ${ldapGroupManagementPanel}
+
+ldapSyncGeneralSettingsPanel:
+  kind: panel.form
+  name: ldapSyncPreferencePanel
+  label: General Synchronization Settings
+  method: PUT
+  contentType: json
+  url: /xapi/ldap-sync/prefs/site
+  contents:
+    ldapSynchronizationRepeat:
+      kind: panel.input.number
+      name: ldapSynchronizationRepeat
+      label: Repeat Period (in min)
+      validation: integer gte:1 onblur
+      min: 1
+      description: Synchronization process period in minutes
+    ldapSynchronizationScript:
+      tag: script|src="~/scripts/xnat/plugin/ldap-sync/ldap-general-setting.js"
+
+ldapGroupManagementPanel:
+  kind: panel
+  name: ldapGroupManagementPanel
+  label: Manage XNAT/LDAP AuthZ Subscriptions
+  contents:
+    ldapGroupTableContainer:
+      tag: "div#ldapDiv"
+      content: No Auth groups yet
+    ldapGroupScript:
+      tag: script|src="~/scripts/xnat/plugin/ldap-sync/ldap-group-management.js"
+    ldapGroupCss:
+      tag: link|href="~/style/xnat/plugin/ldap-sync/ldap-sync.css"|rel="stylesheet"|type="text/css"

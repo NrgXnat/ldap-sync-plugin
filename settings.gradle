@@ -1,0 +1,14 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+        maven { url "https://nrgxnat.jfrog.io/nrgxnat/gradle-plugins-release" }
+        maven { url "https://nrgxnat.jfrog.io/nrgxnat/libs-release" }
+        maven { url "https://nrgxnat.jfrog.io/nrgxnat/libs-snapshot" }
+        mavenCentral()
+    }
+}
+
+// TODO: Replace this with your project name. The project name should indicate
+//       the function of the plugin.
+rootProject.name = 'ldap-sync'

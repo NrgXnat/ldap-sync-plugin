@@ -1,0 +1,51 @@
+@charset "ISO-8859-1";
+
+/* From ldap-group-management.css */
+.ldap-group-table-header {
+  text-align: right;
+  font-size: 1.1em;
+  margin: 0 5px 5px 0;
+}
+
+#ldapGroupTable p {
+  margin: 3px 0;
+}
+#ldapGroupTable td p:first-of-type {
+  margin-top: 0;
+}
+#ldapGroupTable td p:last-of-type {
+  margin-bottom: 0;
+}
+#ldapGroupTable .switchbox {
+  margin-left: -5px;
+}
+#ldapGroupTable .projects-div {
+  display: flex;
+  flex-direction: column;
+}
+#ldapGroupTable .project-id {
+  text-align: left;
+}
+
+#manageProjectsTable .project-label {
+  width: 100%;
+}
+
+.action-div {
+  display: flex;
+  flex-direction: column;
+}
+
+.action-div .action-btn {
+  margin: 1px;
+}
+
+.test-btn-div {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.test-btn-div > * {
+  margin-left: 1em;
+}

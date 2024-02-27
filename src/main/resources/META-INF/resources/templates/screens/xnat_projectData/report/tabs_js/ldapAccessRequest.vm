@@ -1,0 +1,35 @@
+// ldapAccessRequest
+$(document).ready(function () {
+    var projectID = XNAT.data.page.projectID;
+
+    if (!XNAT.plugin.ldapSync) {
+        XNAT.xhr.get({
+            url: XNAT.url.rootUrl('/xapi/ldap-sync/ldap-projects'),
+            success: function (projectIds) {
+                if (!projectIds.includes(projectID)) {
+                    return;
+                }
+                $(document)
+                    .find('div.error')
+                    .find('a')
+                    .filter(':contains(Request Access)')
+                    .parent()
+                    .html(
+                        'Your account has not been granted access to this ' +
+                        XNAT.app.displayNames.singular.project +
+                        "'s data. The user access for this " +
+                        XNAT.app.displayNames.singular.project +
+                        ' is managed by LDAP. ' +
+                        'If you would like to view this data, please contact your ' + XNAT.app.siteId + ' administrators.'
+                    );
+                },
+            error: function (xhr) {
+                XNAT.ui.banner.top(
+                    3000,
+                    "Failed to check if this project's access is managed by LDAP",
+                    'error'
+                );
+            },
+        });
+    }
+});

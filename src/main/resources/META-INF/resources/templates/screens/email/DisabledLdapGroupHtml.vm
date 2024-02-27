@@ -1,0 +1,16 @@
+<html>
+<body>
+<h3>Disabled LDAP Group</h3>
+<br/>
+Please note that the following LDAP Group have been disabled.
+<br/><br/>
+<table>
+    <tr><th>LDAP GROUP:</th><td>$label</td></tr>
+    <tr><th>TIME:</th><td>$time</td></tr>
+    <tr><th>AFFECTED PROJECTS:</th><td>$projects</td></tr>
+    <tr><th>REASON:</th><td>$reason</td></tr>
+</table>
+<br/>
+</body>
+</html>
+

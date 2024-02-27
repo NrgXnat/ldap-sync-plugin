@@ -1,0 +1,13 @@
+<!--warningFromLdapSynchronizationPluginBanner-->
+
+<script type="text/javascript" src="$!content.getURI("scripts/xnat/plugin/ldap-sync/ldap-warning.js")"></script>
+<link rel="stylesheet" type="text/css" href="$!content.getURI("style/xnat/plugin/ldap-sync/ldap-warning.css")"/>
+
+<div class="clearfix">
+    <div id="ldap-warning-container" class='info'>
+        <span class="close"><i class="fa fa-close"></i></span>
+        <strong>LDAP Synchronization: </strong>
+        <span class="loading">Please wait... loading status.</span>
+        <span class="message">All the User management related functions except for the Group management have been disabled. You can still manage Groups and change Groups of users. But you are not allowed to directly invite new users or remove users.</span>
+    </div>
+</div>
