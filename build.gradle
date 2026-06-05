@@ -21,7 +21,7 @@ plugins {
 }
 
 group "com.radiologics"
-version "1.0.0"
+version "1.1.0-SNAPSHOT"
 description "XNAT LDAP Synchronization Plugin"
 
 repositories {
