@@ -88,6 +88,7 @@ dependencies {
     testImplementation "org.assertj:assertj-core"
     testImplementation "com.h2database:h2"
     testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-guava:${vJackson}"
+    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate4:${vJackson}"
 //    testImplementation "org.powermock:powermock-module-junit4"
 //    testImplementation "org.powermock:powermock-api-mockito2"
     testImplementation "org.mockito:mockito-core:3.9.0"
