@@ -78,6 +78,9 @@ dependencies {
     compileOnly "org.aspectj:aspectjweaver"
     compileOnly("org.apache.velocity:velocity") { transitive = false }
     compileOnly "javax.servlet:javax.servlet-api"
+    // tests reference javax.servlet.Filter / xdat classes via Mockito — see CHECKLIST §5.3
+    testCompileOnly "javax.servlet:javax.servlet-api"
+    testRuntimeOnly "javax.servlet:javax.servlet-api"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api"
     testImplementation "org.junit.vintage:junit-vintage-engine"
