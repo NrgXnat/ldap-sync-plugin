@@ -6,7 +6,7 @@
 
 buildscript {
     ext {
-        vXnat = "1.8.4"
+        vXnat = "1.10.1-SNAPSHOT"
         pluginAppName = "LDAP Synchronization Service"
     }
 }
@@ -14,10 +14,11 @@ buildscript {
 plugins {
     id "jacoco"
     id "java"
-    id "com.palantir.git-version" version "0.12.1"
-    id "io.franzbecker.gradle-lombok" version "4.0.0"
-    id "io.spring.dependency-management" version "1.0.11.RELEASE"
-    id "org.nrg.xnat.build.xnat-data-builder" version "1.8.3"
+    id "maven-publish"
+    id "com.palantir.git-version" version "3.0.0"
+    id "io.franzbecker.gradle-lombok" version "5.0.0"
+    id "io.spring.dependency-management" version "1.1.7"
+    id "org.nrg.xnat.build.xnat-data-builder" version "${vXnat}"
 }
 
 group "com.radiologics"
@@ -35,8 +36,9 @@ dependencyManagement.imports {
     mavenBom "org.nrg:parent:${vXnat}"
 }
 
-def vJackson = dependencyManagement.importedProperties["jackson.version"]
-def vSpringSecurity = dependencyManagement.importedProperties["spring-security.version"]
+// BOM 1.10.1-SNAPSHOT dropped importedProperties — hardcode
+def vJackson = "2.13.5"
+def vSpringSecurity = "5.7.13"
 
 configurations {
     all {
@@ -57,12 +59,7 @@ dependencies {
     implementation("org.nrg.xnat:web") {
         transitive = false
     }
-    implementation("org.nrg:dicom-xnat-mx") {
-        transitive = false
-    }
-    implementation("org.nrg.xnat:xnat-data-models") {
-        transitive = false
-    }
+    // dicom-xnat-mx + xnat-data-models merged into xnat-web in monorepo 1.10
     implementation "org.nrg.xdat:core"
     implementation "org.nrg:prefs"
     implementation "org.nrg:framework"
@@ -75,7 +72,15 @@ dependencies {
 
     implementation "org.apache.activemq:activemq-all"
 
-    compileOnly "log4j:log4j"
+    compileOnly "log4j:log4j:1.2.17"
+
+    // Compile-only deps that xnat-web no longer surfaces on consumer compileClasspath in monorepo 1.10.1+
+    compileOnly "org.aspectj:aspectjweaver"
+    compileOnly("org.apache.velocity:velocity") { transitive = false }
+    compileOnly "javax.servlet:javax.servlet-api"
+    // tests reference javax.servlet.Filter / xdat classes via Mockito — see CHECKLIST §5.3
+    testCompileOnly "javax.servlet:javax.servlet-api"
+    testRuntimeOnly "javax.servlet:javax.servlet-api"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api"
     testImplementation "org.junit.vintage:junit-vintage-engine"
@@ -86,12 +91,14 @@ dependencies {
     testImplementation "org.assertj:assertj-core"
     testImplementation "com.h2database:h2"
     testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-guava:${vJackson}"
+    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate4:${vJackson}"
 //    testImplementation "org.powermock:powermock-module-junit4"
 //    testImplementation "org.powermock:powermock-api-mockito2"
     testImplementation "org.mockito:mockito-core:3.9.0"
     testImplementation "org.mockito:mockito-inline:3.9.0"
 
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"  // Gradle 9 requires explicit launcher
     testRuntimeOnly "ch.qos.logback:logback-classic"
 }
 
@@ -120,19 +127,19 @@ try {
     isCleanTag = false
 }
 
-ext.gitManifest = manifest {
-    attributes "Application-Name": project.description,
-            "Build-Date": buildDate,
-            "Build-Number": buildNumber,
-            "Implementation-Version": project.version,
-            "Implementation-Sha": gitHash,
-            "Implementation-Sha-Full": gitHashFull,
-            "Implementation-Commit": commitDistance,
-            "Implementation-LastTag": lastTag,
-            "Implementation-Branch": branchName,
-            "Implementation-CleanTag": isCleanTag,
-            "Implementation-Dirty": isDirty
-}
+ext.gitManifestAttrs = [
+        "Application-Name"        : project.description,
+        "Build-Date"              : buildDate,
+        "Build-Number"            : buildNumber,
+        "Implementation-Version"  : project.version,
+        "Implementation-Sha"      : gitHash,
+        "Implementation-Sha-Full" : gitHashFull,
+        "Implementation-Commit"   : commitDistance,
+        "Implementation-LastTag"  : lastTag,
+        "Implementation-Branch"   : branchName,
+        "Implementation-CleanTag" : isCleanTag,
+        "Implementation-Dirty"    : isDirty
+]
 
 logger.info """
 Building artifacts with manifest attributes:
@@ -152,8 +159,8 @@ Building artifacts with manifest attributes:
 compileJava.dependsOn project.tasks["xnatDataBuilder"]
 
 lombok {
-    version = dependencyManagement.importedProperties["lombok.version"] as String
-    sha256 = dependencyManagement.importedProperties["lombok.checksum"] as String
+    version = "1.18.34"
+    sha256 = "1ea5ad6c6afcff902d75072b2aaa6695585aebee9f12127e15c0036ba95d2918"
 }
 
 jacocoTestReport {
@@ -195,24 +202,24 @@ java {
     //       application. All plugins must be 1.8 compatible as well. This does NOT mean
     //       the code must be compiled with Java 8, just that the compiled byte code must
     //       be compatible with running in a Java 8 environment.
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 // TODO: This builds a sources jar that pulls in the manifest with VCS info from above.
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier "sources"
+    archiveClassifier.set("sources")
     manifest {
-        from gitManifest
+        attributes gitManifestAttrs
     }
     from sourceSets.main.allSource
 }
 
 // TODO: This builds a javadoc jar that pulls in the manifest with VCS info from above.
 task javadocJar(type: Jar) {
-    classifier "javadoc"
+    archiveClassifier.set("javadoc")
     manifest {
-        from gitManifest
+        attributes gitManifestAttrs
     }
     from javadoc.destinationDir
 }
@@ -223,7 +230,7 @@ jar {
     dependsOn test, sourcesJar, javadocJar
     enabled = true
     manifest {
-        from gitManifest
+        attributes gitManifestAttrs
     }
 }
 
@@ -236,7 +243,7 @@ task xnatPluginJar(type: Jar) {
     zip64 true
     archiveClassifier.set "xpl"
     manifest {
-        from gitManifest
+        attributes gitManifestAttrs
     }
 
     // files and folders with "-dev" or "--xx" in their name
@@ -255,4 +262,29 @@ task xnatPluginJar(type: Jar) {
 
 test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifacts {
+                artifact xnatPluginJar
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "XNAT_Artifactory"
+            url = project.version.toString().endsWith("-SNAPSHOT")
+                ? "https://nrgxnat.jfrog.io/nrgxnat/libs-snapshot-local"
+                : "https://nrgxnat.jfrog.io/nrgxnat/libs-release-local"
+            // CI injects ORG_GRADLE_PROJECT_artifactoryUser/Token env vars (Gradle maps
+            // these to project properties). Local devs can set artifactoryUser/Token in
+            // ~/.gradle/gradle.properties. Mirrors monorepo's buildSrc convention.
+            credentials {
+                username = (project.findProperty("artifactoryUser")  ?: System.getenv("ARTIFACTORY_USER"))  ?: ""
+                password = (project.findProperty("artifactoryToken") ?: System.getenv("ARTIFACTORY_TOKEN")) ?: ""
+            }
+        }
+    }
 }
